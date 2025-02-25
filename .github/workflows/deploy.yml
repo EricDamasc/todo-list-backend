@@ -19,14 +19,14 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: 📦 Instalar dependências corretamente
+      - name: 📦 Instalar dependências dentro do projeto
         run: |
           pip install --upgrade pip
-          pip install --platform manylinux2014_x86_64 --only-binary=:all: --target . -r requirements.txt
+          pip install -r requirements.txt --target .
 
-      - name: 🔹 Criar o arquivo ZIP com tudo
+      - name: 🔹 Criar o arquivo ZIP para o Lambda
         run: |
-          zip -r deployment-package.zip . -x "*.git*" "*venv*" "*__pycache__*" "*tests*" ".github/*"
+          zip -r deployment-package.zip . -x ".git/*" ".github/*" "venv/*" "__pycache__/*" "tests/*"        
 
       - name: 📂 Verificar arquivos no ZIP
         run: |
