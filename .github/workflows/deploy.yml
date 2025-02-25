@@ -22,15 +22,11 @@ jobs:
       - name: 📦 Instalar dependências corretamente
         run: |
           pip install --upgrade pip
-          pip install --platform manylinux2014_x86_64 --only-binary=:all: --target package -r requirements.txt
+          pip install --platform manylinux2014_x86_64 --only-binary=:all: --target . -r requirements.txt
 
-      - name: 🔹 Criar o arquivo ZIP para o Lambda
+      - name: 🔹 Criar o arquivo ZIP com tudo
         run: |
-          cd package
-          zip -r ../deployment-package.zip .
-          cd ..
-          zip -g deployment-package.zip lambda_function.py
-          zip -g deployment-package.zip -r app
+          zip -r deployment-package.zip . -x "*.git*" "*venv*" "*__pycache__*" "*tests*" ".github/*"
 
       - name: 📂 Verificar arquivos no ZIP
         run: |
@@ -41,7 +37,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: us-east-1  # Substitua pela sua região
 
       - name: 🚀 Fazer deploy no AWS Lambda
         run: |
