@@ -3,7 +3,8 @@ name: CI/CD - Deploy para AWS Lambda
 on:
   push:
     branches:
-      - main  # Dispara o deploy ao fazer push na branch main
+      - main
+      - develop  # Agora roda na branch develop
 
 jobs:
   deploy:
@@ -18,17 +19,18 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: 📦 Instalar dependências
+      - name: 📦 Instalar dependências corretamente
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt -t package
+          pip install --platform manylinux2014_x86_64 --only-binary=:all: --target . -r requirements.txt
 
-      - name: 🔹 Criar o arquivo ZIP para o Lambda
+      - name: 🔹 Criar o arquivo ZIP com tudo
         run: |
-          cd package
-          zip -r ../deployment-package.zip .
-          cd ..
-          zip -g deployment-package.zip -r app
+          zip -r deployment-package.zip . -x "*.git*" "*venv*" "*__pycache__*" "*tests*" ".github/*"
+
+      - name: 📂 Verificar arquivos no ZIP
+        run: |
+          unzip -l deployment-package.zip
 
       - name: 🔐 Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v2
@@ -39,4 +41,34 @@ jobs:
 
       - name: 🚀 Fazer deploy no AWS Lambda
         run: |
-          aws lambda update-function-code --function-name todo-list-lambda --zip-file fileb://deployment-package.zip
+          aws lambda update-function-code --function-name lambdaTodoListApi --zip-file fileb://deployment-package.zip
+
+  merge-to-main:
+    needs: deploy
+    if: github.ref == 'refs/heads/develop'  # Só executa se estiver na develop
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Checkout do código
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: 🔀 Fazer merge da develop na main
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout main
+          git merge develop --no-ff -m "🔀 Merge develop into main"
+          git push origin main
+
+      - name: 🔀 Criar Pull Request para a main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.PAT_TOKEN }}  # Usa a PAT para criar PR
+          branch: develop
+          base: main
+          title: "🔀 Merge develop -> main"
+          body: "Esse PR foi criado automaticamente para sincronizar a branch develop com a main."
+          labels: "auto-pr"
+          assignees: "EricDamascena"  # Substitua pelo seu usuário do GitHub
