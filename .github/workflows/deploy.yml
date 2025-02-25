@@ -25,8 +25,11 @@ jobs:
 
       - name: 🔹 Criar o arquivo ZIP para o Lambda
         run: |
-          zip -r deployment-package.zip . -x "*.git*" "tests/*" ".github/*" "__pycache__/*" "*.md"
-          zip -sf deployment-package.zip
+          zip -r deployment-package.zip . -x "package/*" ".git/*" ".github/*" "__pycache__/*" "tests/*"
+  
+      - name: 📂 Verificar arquivos no ZIP
+        run: |
+          unzip -l deployment-package.zip
 
       - name: 🔐 Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v2
