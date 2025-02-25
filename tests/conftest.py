@@ -4,7 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Definir um valor padrão para a variável de ambiente DATABASE_URL
-DATABASE_URL = "sqlite:///:memory:"
+import os
+os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 
 from app.database.database import get_db, Base
 from app.main import app

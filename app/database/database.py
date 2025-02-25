@@ -18,7 +18,7 @@ engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,  # Evita falha em conexões inativas
     pool_size=5,         # Número máximo de conexões (ajuste conforme necessário)
-    max_overflow=10,      # Conexões extras se necessário
+    max_overflow=10,     # Conexões extras se necessário
 )
 
 # Criar sessão do banco
