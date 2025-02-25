@@ -11,3 +11,4 @@ pydantic
 psycopg2-binary
 mangum
 pytest
+httpx
