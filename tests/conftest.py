@@ -1,11 +1,10 @@
-import os
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Definir um valor padrão para a variável de ambiente DATABASE_URL
-os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+DATABASE_URL = "sqlite:///:memory:"
 
 from app.database.database import get_db, Base
 from app.main import app
