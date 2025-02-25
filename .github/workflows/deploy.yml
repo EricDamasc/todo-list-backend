@@ -39,4 +39,4 @@ jobs:
 
       - name: 🚀 Fazer deploy no AWS Lambda
         run: |
-          aws lambda update-function-code --function-name todo-list-lambda --zip-file fileb://deployment-package.zip
+          aws lambda update-function-code --function-name lambdaTodoListApi --zip-file fileb://deployment-package.zip
