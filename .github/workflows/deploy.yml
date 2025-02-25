@@ -29,6 +29,7 @@ jobs:
           zip -r ../deployment-package.zip .
           cd ..
           zip -g deployment-package.zip -r app
+          zip -g deployment-package.zip lambda_function.py
 
       - name: 🔐 Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v2
