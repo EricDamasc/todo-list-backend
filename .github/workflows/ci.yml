@@ -1,56 +1,64 @@
-name: CI Pipeline
+name: CI/CD - Deploy para AWS Lambda
 
 on:
-  pull_request:
-    branches:
-      - main
-      - develop
   push:
     branches:
       - main
-      - develop
+      - develop  # Agora roda na branch develop
 
 jobs:
-  build:
-    name: 🏗️ Build da Aplicação
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout do código
-        uses: actions/checkout@v4
+      - name: 🔄 Checkout do código
+        uses: actions/checkout@v3
 
       - name: 🐍 Configurar Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: "3.11"
 
       - name: 📦 Instalar dependências
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install --upgrade pip
+          pip install -r requirements.txt -t package
 
-      - name: 🏗️ Rodar build (validação do código)
+      - name: 🔹 Criar o arquivo ZIP para o Lambda
         run: |
-          python -m compileall -q .
+          cd package
+          zip -r ../deployment-package.zip .
+          cd ..
+          zip -g deployment-package.zip -r app
 
-  # test:
-  #   name: 🔬 Rodar Testes
-  #   needs: build  # Só roda os testes se o build for bem-sucedido
-  #   runs-on: ubuntu-latest
+      - name: 🔐 Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Substitua pela sua região
 
-  #   steps:
-  #     - name: 📥 Checkout do código
-  #       uses: actions/checkout@v4
+      - name: 🚀 Fazer deploy no AWS Lambda
+        run: |
+          aws lambda update-function-code --function-name lambdaTodoListApi --zip-file fileb://deployment-package.zip
 
-  #     - name: 🐍 Configurar Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: "3.11"
+  create-pr:
+    needs: deploy
+    if: github.ref == 'refs/heads/develop'  # Só cria PR se estiver na develop
+    runs-on: ubuntu-latest
 
-  #     - name: 📦 Instalar dependências
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install -r requirements.txt
+    steps:
+      - name: 🔄 Checkout do código
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-  #     - name: 🔬 Rodar testes com pytest
-  #       run: pytest --disable-warnings --maxfail=1
+      - name: 🔀 Criar Pull Request para a main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: develop
+          base: main
+          title: "🔀 Merge develop -> main"
+          body: "Esse PR foi criado automaticamente para sincronizar a branch develop com a main."
+          labels: "auto-pr"
+          assignees: "EricDamasceno"  # Substitua pelo seu usuário do GitHub
