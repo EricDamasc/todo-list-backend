@@ -10,3 +10,4 @@ python-jose
 pydantic
 psycopg2-binary
 mangum
+pytest
