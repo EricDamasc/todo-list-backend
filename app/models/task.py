@@ -15,5 +15,5 @@ class Task(Base):
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
     completed = Column(Boolean, default=False)
-    due_date = Column(DateTime, default=datetime.utcnow)
-    priority = Column(Enum(PriorityEnum), default=PriorityEnum.media)
+    due_date = Column(DateTime, default=lambda: datetime.utcnow())  # 🔹 Corrigido
+    priority = Column(Enum(PriorityEnum, native_enum=False), default=PriorityEnum.media)  # 🔹 Melhor compatibilidade
