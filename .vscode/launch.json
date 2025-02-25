@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: FastAPI",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/main.py",  // Certifique-se de que está apontando para o seu arquivo main.py
+        "args": ["run", "--reload"],
+        "env": {
+          "PYTHONPATH": "${workspaceFolder}"  // Adiciona o diretório do projeto ao PYTHONPATH
+        },
+        "jinja": true,
+        "debugOptions": [
+          "RedirectOutput"
+        ]
+      }
+    ]
+  }
+  
