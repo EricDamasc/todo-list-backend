@@ -1,0 +1,56 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    name: 🏗️ Build da Aplicação
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🏗️ Rodar build (validação do código)
+        run: |
+          python -m compileall -q .
+
+  test:
+    name: 🔬 Rodar Testes
+    needs: build  # Só roda os testes se o build for bem-sucedido
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🔬 Rodar testes com pytest
+        run: pytest --disable-warnings --maxfail=1
