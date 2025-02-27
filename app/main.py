@@ -1,8 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware  # 🔹 Importação necessária
 from mangum import Mangum
 from app.routers import tasks
 from app.auth import auth
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="To-Do List API",
@@ -10,13 +10,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# 🔹 Configurar CORS no FastAPI
+# 🔹 Configuração do CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Ou substitua pelo seu domínio específico
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Permite todos os métodos HTTP (GET, POST, etc.)
+    allow_headers=["*"],  # Permite todos os headers
 )
 
 # 🔹 Rota inicial
