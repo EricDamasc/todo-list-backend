@@ -6,11 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configurar a conexão com o DynamoDB
-dynamodb = boto3.resource("dynamodb",
-    region_name=os.getenv("AWS_REGION", "us-east-1"),  # Pega do ambiente, padrão us-east-1
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),  # Pega do ambiente
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),  # Pega do ambiente
-)
+dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
 
 # Referência para as tabelas
 task_table = dynamodb.Table("ToDoList")  # Tabela de tarefas
