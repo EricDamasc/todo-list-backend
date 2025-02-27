@@ -13,9 +13,10 @@ app = FastAPI(
 # 🔹 Configuração do CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 🔹 Permite qualquer origem (mas sem credenciais)
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["http://localhost:4200"],  # URL do frontend
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos os métodos HTTP
+    allow_headers=["*"],  # Permitir todos os headers
 )
 
 @app.options("/{path:path}")
