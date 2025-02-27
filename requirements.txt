@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-sqlalchemy
+boto3
 databases
 alembic
 python-dotenv
