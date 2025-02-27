@@ -18,11 +18,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.options("/{full_path:path}")
-async def preflight_request(full_path: str, response: Response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
+@app.options("/{path:path}")
+async def preflight_request(response: Response):
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:4200"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
 
 # 🔹 Rota inicial
