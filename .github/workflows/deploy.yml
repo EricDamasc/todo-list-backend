@@ -6,6 +6,11 @@ on:
       - main
       - develop  # Agora roda na branch develop
 
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
