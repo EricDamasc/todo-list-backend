@@ -13,19 +13,10 @@ app = FastAPI(
 # 🔹 Configuração do CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # URL do frontend
-    allow_credentials=True,
-    allow_methods=["*"],  # Permitir todos os métodos HTTP
-    allow_headers=["*"],  # Permitir todos os headers
+    allow_origins=["*"],  # 🔹 Permite qualquer origem (mas sem credenciais)
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
-@app.options("/{path:path}")
-async def preflight_request(response: Response):
-    response.headers["Access-Control-Allow-Origin"] = "http://localhost:4200"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    return response
 
 # 🔹 Rota inicial
 @app.get("/", tags=["Home"])
