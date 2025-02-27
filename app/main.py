@@ -10,13 +10,21 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# 🔹 Configuração do CORS
+# Configurar CORS corretamente
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 🔹 Permite qualquer origem (mas sem credenciais)
+    allow_origins=["http://localhost:4200", "https://kloc449ejb.execute-api.us-east-1.amazonaws.com"],  # Substitua pelo frontend real
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Criar uma rota OPTIONS manualmente
+@app.options("/{path:path}")
+async def preflight_request():
+    return {
+        "message": "Preflight request successful"
+    }
 
 # 🔹 Rota inicial
 @app.get("/", tags=["Home"])
