@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - develop  # Agora roda na branch develop
+      - develop
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -13,6 +13,7 @@ env:
 
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/develop'  # 🔹 Só executa na develop
     runs-on: ubuntu-latest
 
     steps:
@@ -42,7 +43,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Substitua pela sua região
+          aws-region: us-east-1  
 
       - name: 🚀 Fazer deploy no AWS Lambda
         run: |
@@ -50,7 +51,7 @@ jobs:
 
   merge-to-main:
     needs: deploy
-    if: github.ref == 'refs/heads/develop'  # Só executa se estiver na develop
+    if: github.ref == 'refs/heads/develop'  # 🔹 Só executa se o push for na develop
     runs-on: ubuntu-latest
     steps:
       - name: 🔄 Checkout do código
@@ -66,14 +67,3 @@ jobs:
           git checkout main
           git merge develop --no-ff -m "🔀 Merge develop into main"
           git push origin main
-
-      - name: 🔀 Criar Pull Request para a main
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.PAT_TOKEN }}  # Usa a PAT para criar PR
-          branch: develop
-          base: main
-          title: "🔀 Merge develop -> main"
-          body: "Esse PR foi criado automaticamente para sincronizar a branch develop com a main."
-          labels: "auto-pr"
-          assignees: "EricDamascena"  # Substitua pelo seu usuário do GitHub
