@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Response
-from fastapi.middleware.cors import CORSMiddleware  # 🔹 Importação necessária
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from app.routers import tasks
 from app.auth import auth
