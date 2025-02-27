@@ -59,7 +59,7 @@ def login(user_data: UserLogin, db = Depends(get_user_table)):
     response = db.get_item(Key={"email": user_data.email})
     user = response.get("Item")
 
-    if not user or not verify_password(user_data.password, user["password_hash"]):
+    if not user or not verify_password(user_data.password, user["password"]):
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
     token = create_access_token({"sub": user["email"]})
