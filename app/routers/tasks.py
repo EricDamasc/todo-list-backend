@@ -26,7 +26,11 @@ def get_tasks(user: dict = Depends(get_current_user)):
 
     if "Items" not in response or not response["Items"]:
         logger.warning(f"Nenhuma tarefa encontrada para o usuário {user_id}")
-        raise HTTPException(status_code=404, detail="Nenhuma tarefa encontrada")
+        raise HTTPException(status_code=200, detail="Nenhuma tarefa encontrada")
+    
+    elif response['Items'] == []:
+        logger.warning(f"Nenhuma tarefa encontrada para o usuário {user_id}")
+        return response['Items']
 
     logger.info(f"Tarefas encontradas para o usuário")
     return response["Items"]
@@ -46,7 +50,7 @@ def create_tasks(tasks: List[TaskCreate], user: dict = Depends(get_current_user)
             "completed": task.completed,
             "due_date": task.due_date,
             "priority": task.priority.value,
-            "created_at": datetime.now().isoformat(),
+            "created_at": task.creadted_at or datetime.now().isoformat()
         }
         task_table.put_item(Item=item)
         created_tasks.append(item)
