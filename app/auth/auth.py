@@ -56,4 +56,4 @@ def login(user_data: UserLogin, db = Depends(get_user_table)):
 
     token = create_access_token({"sub": user["email"], "username": user["username"]})
     logger.info(f"Usuário {user_data.email} autenticado com sucesso")
-    return {"access_token": token, "token_type": "bearer"}
+    return {"access_token": token, "username": user["username"], "token_type": "bearer"}
