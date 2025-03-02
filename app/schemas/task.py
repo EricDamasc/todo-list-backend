@@ -20,6 +20,7 @@ class TaskCreate(TaskBase):
 class TaskResponse(TaskBase):
     task_id: str
     user_id: str
+    created_at: str
 
     class Config:
         orm_mode = True
