@@ -165,7 +165,3 @@ todo-list-frontend/
 
 - **DELETE /tasks/{task_id}**: Deleta uma tarefa existente.
   - Response: `{"message": "Tarefa removida com sucesso"}`
-
-## Contribuição
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue ou enviar um pull request.
