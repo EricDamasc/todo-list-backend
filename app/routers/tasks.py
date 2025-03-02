@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 import uuid
@@ -11,21 +12,25 @@ load_dotenv()
 
 router = APIRouter()
 
-# Obter todas as tarefas de um usuário
+# Configuração do logger
+logger = logging.getLogger(__name__)
+
 @router.get("/tasks", response_model=List[TaskResponse])
 def get_tasks(user: dict = Depends(get_current_user)):
     user_id = user["username"]
+    logger.info(f"Fetching tasks for user {user_id}")
     response = task_table.query(
         KeyConditionExpression="user_id = :user_id",
         ExpressionAttributeValues={":user_id": user_id}
     )
 
     if "Items" not in response or not response["Items"]:
+        logger.warning(f"Nenhuma tarefa encontrada para o usuário {user_id}")
         raise HTTPException(status_code=404, detail="Nenhuma tarefa encontrada")
 
+    logger.info(f"Tarefas encontradas para o usuário")
     return response["Items"]
 
-# Criar múltiplas tarefas
 @router.post("/tasks", response_model=List[TaskResponse])
 def create_tasks(tasks: List[TaskCreate], user: dict = Depends(get_current_user)):
     user_id = user["username"]
@@ -45,12 +50,14 @@ def create_tasks(tasks: List[TaskCreate], user: dict = Depends(get_current_user)
         }
         task_table.put_item(Item=item)
         created_tasks.append(item)
+        logger.info(f"Tarefa {task_id} criada para o usuário {user_id}")
 
     return created_tasks
 
-# Atualizar uma tarefa pelo ID
 @router.put("/tasks/{task_id}", response_model=TaskResponse)
-def update_task(task_id: str, updated_task: TaskCreate, user_id: str = Depends(get_current_user)):
+def update_task(task_id: str, updated_task: TaskCreate, user: dict = Depends(get_current_user)):
+    user_id = user["username"]
+    logger.info(f"Atualizando tarefa {task_id} para o usuário {user_id}")
     response = task_table.update_item(
         Key={"user_id": user_id, "task_id": task_id},
         UpdateExpression="SET title=:t, description=:d, completed=:c, due_date=:du, priority=:p",
@@ -65,13 +72,16 @@ def update_task(task_id: str, updated_task: TaskCreate, user_id: str = Depends(g
     )
 
     if "Attributes" not in response:
+        logger.warning(f"Tarefa {task_id} não encontrada para o usuário {user_id}")
         raise HTTPException(status_code=404, detail="Tarefa não encontrada")
 
+    logger.info(f"Tarefa {task_id} atualizada para o usuário {user_id}")
     return response["Attributes"]
 
-# Deletar uma tarefa pelo ID
 @router.delete("/tasks/{task_id}", response_model=dict)
-def delete_task(task_id: str, user_id: str = Depends(get_current_user)):
+def delete_task(task_id: str, user: dict = Depends(get_current_user)):
+    user_id = user["username"]
+    logger.info(f"Deleta tarefa {task_id} para o usuário {user_id}")
     response = task_table.delete_item(
         Key={"user_id": user_id, "task_id": task_id},
         ReturnValues="ALL_OLD"
@@ -80,4 +90,5 @@ def delete_task(task_id: str, user_id: str = Depends(get_current_user)):
     if "Attributes" not in response:
         raise HTTPException(status_code=404, detail="Tarefa não encontrada")
 
+    logger.info(f"Tarefa {task_id} deletada para o usuário {user_id}")
     return {"message": "Tarefa removida com sucesso"}
