@@ -46,7 +46,7 @@ def create_tasks(tasks: List[TaskCreate], user: dict = Depends(get_current_user)
             "completed": task.completed,
             "due_date": task.due_date,
             "priority": task.priority.value,
-            "created_at": task.created_at.value or datetime.now().isoformat(),
+            "created_at": datetime.now().isoformat(),
         }
         task_table.put_item(Item=item)
         created_tasks.append(item)
