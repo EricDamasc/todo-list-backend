@@ -22,7 +22,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# 🔹 Rota de registro de usuário (sem hash de senha e com username)
+# Rota de registro de usuário
 @router.post("/register", response_model=Token)
 def register(user: UserRegister, db = Depends(get_user_table)):
     # Verifica se o email já está cadastrado no DynamoDB
@@ -33,7 +33,8 @@ def register(user: UserRegister, db = Depends(get_user_table)):
     # Criar novo usuário no DynamoDB
     new_user = {
         "email": user.email,
-        "password": user.password
+        "password": user.password,
+        "username": user.username
     }
     db.put_item(Item=new_user)
 
@@ -50,5 +51,5 @@ def login(user_data: UserLogin, db = Depends(get_user_table)):
     if not user or user_data.password != user["password"]:
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
-    token = create_access_token({"sub": user["email"]})
+    token = create_access_token({"sub": user["email"], "username": user["username"]})
     return {"access_token": token, "token_type": "bearer"}

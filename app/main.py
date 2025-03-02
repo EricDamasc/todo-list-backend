@@ -26,14 +26,14 @@ async def preflight_request():
         "message": "Preflight request successful"
     }
 
-# 🔹 Rota inicial
+# Rota inicial
 @app.get("/", tags=["Home"])
 def root():
     return {"message": "Bem-vindo à API de Tarefas!"}
 
-# 🔹 Adicionar rotas
+# Adicionar rotas
 app.include_router(auth.router, prefix="/api", tags=["Autenticação"])
 app.include_router(tasks.router, prefix="/api", tags=["Tarefas"])
 
-# 🔹 Handler para AWS Lambda
+# Handler para AWS Lambda
 handler = Mangum(app)

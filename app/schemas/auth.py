@@ -4,6 +4,7 @@ from pydantic import BaseModel, EmailStr
 class UserRegister(BaseModel):
     email: EmailStr
     password: str
+    username: str
 
 # 🔹 Esquema para login
 class UserLogin(BaseModel):
