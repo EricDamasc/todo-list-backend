@@ -11,7 +11,6 @@ load_dotenv()
 
 router = APIRouter()
 
-# Obter todas as tarefas de um usuário
 @router.get("/tasks", response_model=List[TaskResponse])
 def get_tasks(user: dict = Depends(get_current_user)):
     user_id = user["username"]
@@ -25,7 +24,6 @@ def get_tasks(user: dict = Depends(get_current_user)):
 
     return response["Items"]
 
-# Criar múltiplas tarefas
 @router.post("/tasks", response_model=List[TaskResponse])
 def create_tasks(tasks: List[TaskCreate], user: dict = Depends(get_current_user)):
     user_id = user["username"]
@@ -48,9 +46,9 @@ def create_tasks(tasks: List[TaskCreate], user: dict = Depends(get_current_user)
 
     return created_tasks
 
-# Atualizar uma tarefa pelo ID
 @router.put("/tasks/{task_id}", response_model=TaskResponse)
-def update_task(task_id: str, updated_task: TaskCreate, user_id: str = Depends(get_current_user)):
+def update_task(task_id: str, updated_task: TaskCreate, user: dict = Depends(get_current_user)):
+    user_id = user["username"]
     response = task_table.update_item(
         Key={"user_id": user_id, "task_id": task_id},
         UpdateExpression="SET title=:t, description=:d, completed=:c, due_date=:du, priority=:p",
@@ -69,9 +67,9 @@ def update_task(task_id: str, updated_task: TaskCreate, user_id: str = Depends(g
 
     return response["Attributes"]
 
-# Deletar uma tarefa pelo ID
 @router.delete("/tasks/{task_id}", response_model=dict)
-def delete_task(task_id: str, user_id: str = Depends(get_current_user)):
+def delete_task(task_id: str, user: dict = Depends(get_current_user)):
+    user_id = user["username"]
     response = task_table.delete_item(
         Key={"user_id": user_id, "task_id": task_id},
         ReturnValues="ALL_OLD"

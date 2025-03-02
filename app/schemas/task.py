@@ -13,7 +13,6 @@ class TaskBase(BaseModel):
     completed: bool = False
     due_date: str
     priority: PriorityEnum
-    
 
 class TaskCreate(TaskBase):
     pass
