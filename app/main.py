@@ -1,8 +1,13 @@
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from app.routers import tasks
 from app.auth import auth
+
+# Configuração do logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="To-Do List API",
@@ -26,6 +31,7 @@ async def preflight_request():
 
 @app.get("/", tags=["Home"])
 def root():
+    logger.info("Root endpoint accessed")
     return {"message": "Bem-vindo à API de Tarefas!"}
 
 app.include_router(auth.router, prefix="/api", tags=["Autenticação"])

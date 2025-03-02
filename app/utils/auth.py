@@ -1,3 +1,4 @@
+import logging
 import os
 import boto3
 from fastapi import Depends, HTTPException
@@ -16,7 +17,11 @@ users_table = dynamodb.Table("Users")
 
 bearer_scheme = HTTPBearer()
 
+# Configuração do logger
+logger = logging.getLogger(__name__)
+
 def get_user_from_dynamodb(email: str):
+    logger.info(f"Buscando usuário {email} no DynamoDB")
     response = users_table.get_item(Key={"email": email})
     return response.get("Item")
 
@@ -26,10 +31,14 @@ def get_current_user(token: HTTPAuthorizationCredentials = Depends(bearer_scheme
         payload = jwt.decode(credentials, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")
         if email is None:
+            logger.warning("Token inválido: sub não encontrado")
             raise HTTPException(status_code=401, detail="Token inválido")
         user = get_user_from_dynamodb(email)
         if not user:
+            logger.warning(f"Usuário {email} não encontrado")
             raise HTTPException(status_code=401, detail="Usuário não encontrado")
+        logger.info(f"Usuário {email} autenticado com sucesso")
         return user
     except JWTError:
+        logger.warning("Token inválido ou expirado")
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")
