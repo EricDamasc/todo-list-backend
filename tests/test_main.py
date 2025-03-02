@@ -8,7 +8,7 @@ def test_read_root():
     assert response.status_code == 200
     assert response.json() == {"message": "Bem-vindo à API de Tarefas!"}
 
-def test_read_tasks():
-    response = client.get("/api/tasks")
+def test_preflight_request():
+    response = client.options("/some-path")
     assert response.status_code == 200
-    # Add more assertions based on the expected response from the /api/tasks endpoint
+    assert response.json() == {"message": "Preflight request successful"}

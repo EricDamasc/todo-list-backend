@@ -31,11 +31,9 @@ def get_current_user(token: HTTPAuthorizationCredentials = Depends(bearer_scheme
         email = payload.get("sub")
         if email is None:
             raise HTTPException(status_code=401, detail="Token inválido")
-        
         user = get_user_from_dynamodb(email)
         if not user:
             raise HTTPException(status_code=401, detail="Usuário não encontrado")
-
-        return user  # Retorna o objeto User do DynamoDB
-    except JWTError as e:
+        return user
+    except JWTError:
         raise HTTPException(status_code=401, detail="Token inválido ou expirado")

@@ -4,22 +4,35 @@ import uuid
 from datetime import datetime
 from app.database.database import task_table
 from app.schemas.task import TaskCreate, TaskResponse
+from dotenv import load_dotenv
+from app.utils.auth import get_current_user
+
+load_dotenv()
 
 router = APIRouter()
 
-# 🔹 Obter todas as tarefas (sem filtro por usuário)
+# Obter todas as tarefas de um usuário
 @router.get("/tasks", response_model=List[TaskResponse])
-def get_tasks():
-    response = task_table.scan()  # Retorna todos os itens da tabela
-    return response.get("Items", [])  # Retorna a lista de tarefas
+def get_tasks(user: dict = Depends(get_current_user)):
+    user_id = user["username"]
+    response = task_table.query(
+        KeyConditionExpression="user_id = :user_id",
+        ExpressionAttributeValues={":user_id": user_id}
+    )
 
-# 🔹 Criar múltiplas tarefas
+    if "Items" not in response or not response["Items"]:
+        raise HTTPException(status_code=404, detail="Nenhuma tarefa encontrada")
+
+    return response["Items"]
+
+# Criar múltiplas tarefas
 @router.post("/tasks", response_model=List[TaskResponse])
-def create_tasks(tasks: List[TaskCreate], user_id: str):
+def create_tasks(tasks: List[TaskCreate], user: dict = Depends(get_current_user)):
+    user_id = user["username"]
     created_tasks = []
 
     for task in tasks:
-        task_id = str(uuid.uuid4())  # Gerar um UUID para cada tarefa
+        task_id = str(uuid.uuid4())
         item = {
             "user_id": user_id,
             "task_id": task_id,
@@ -27,7 +40,7 @@ def create_tasks(tasks: List[TaskCreate], user_id: str):
             "description": task.description,
             "completed": task.completed,
             "due_date": task.due_date,
-            "priority": task.priority.value,  # Convertendo Enum para string
+            "priority": task.priority.value,
             "created_at": datetime.utcnow().isoformat(),
         }
         task_table.put_item(Item=item)
@@ -35,9 +48,9 @@ def create_tasks(tasks: List[TaskCreate], user_id: str):
 
     return created_tasks
 
-# 🔹 Atualizar uma tarefa pelo ID
+# Atualizar uma tarefa pelo ID
 @router.put("/tasks/{task_id}", response_model=TaskResponse)
-def update_task(task_id: str, user_id: str, updated_task: TaskCreate):
+def update_task(task_id: str, updated_task: TaskCreate, user_id: str = Depends(get_current_user)):
     response = task_table.update_item(
         Key={"user_id": user_id, "task_id": task_id},
         UpdateExpression="SET title=:t, description=:d, completed=:c, due_date=:du, priority=:p",
@@ -56,9 +69,9 @@ def update_task(task_id: str, user_id: str, updated_task: TaskCreate):
 
     return response["Attributes"]
 
-# 🔹 Deletar uma tarefa pelo ID
+# Deletar uma tarefa pelo ID
 @router.delete("/tasks/{task_id}", response_model=dict)
-def delete_task(task_id: str, user_id: str):
+def delete_task(task_id: str, user_id: str = Depends(get_current_user)):
     response = task_table.delete_item(
         Key={"user_id": user_id, "task_id": task_id},
         ReturnValues="ALL_OLD"
