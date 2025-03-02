@@ -70,7 +70,7 @@ def update_task(task_id: str, updated_task: TaskCreate, user: dict = Depends(get
             ":d": updated_task.description,
             ":c": updated_task.completed,
             ":du": updated_task.due_date,
-            ":p": updated_task.priority.value,
+            ":p": updated_task.priority.value
         },
         ReturnValues="ALL_NEW"
     )
