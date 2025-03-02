@@ -21,6 +21,7 @@ class TaskCreate(TaskBase):
 class TaskResponse(TaskBase):
     task_id: str
     user_id: str
+    creadted_at: str
 
     class Config:
         orm_mode = True
