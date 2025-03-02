@@ -13,7 +13,6 @@ class TaskBase(BaseModel):
     completed: bool = False
     due_date: str
     priority: PriorityEnum
-    creadted_at: str
 
 class TaskCreate(TaskBase):
     pass
@@ -21,7 +20,6 @@ class TaskCreate(TaskBase):
 class TaskResponse(TaskBase):
     task_id: str
     user_id: str
-    creadted_at: str
 
     class Config:
         orm_mode = True
