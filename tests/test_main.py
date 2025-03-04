@@ -1,7 +1,16 @@
 from fastapi.testclient import TestClient
 from app.main import app
+import boto3
+from moto import mock_aws
+import pytest
 
 client = TestClient(app)
+
+@pytest.fixture(scope='function')
+def dynamodb_mock():
+    with mock_aws():
+        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+        yield dynamodb
 
 def test_read_root():
     response = client.get("/")
