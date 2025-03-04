@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - develop
+      - 'feature/*'
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -12,8 +12,44 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
+  build-and-test:
+    if: startsWith(github.ref, 'refs/heads/feature/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔄 Checkout do código
+        uses: actions/checkout@v3
+
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Instalar dependências dentro do projeto
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🧪 Rodar testes
+        run: |
+          pytest
+
+      - name: 🔨 Build do projeto
+        run: |
+          # Adicione aqui os comandos necessários para build do seu projeto
+          echo "Build do projeto"
+
+      - name: 🔀 Criar Pull Request para develop
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: develop
+          title: "Merge feature branch into develop"
+          body: "Este PR foi criado automaticamente para mergear a branch feature na develop."
+          base: develop
+
   deploy:
-    if: github.ref == 'refs/heads/develop'  # 🔹 Só executa na develop
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
 
     steps:
@@ -51,7 +87,7 @@ jobs:
 
   merge-to-main:
     needs: deploy
-    if: github.ref == 'refs/heads/develop'  # 🔹 Só executa se o push for na develop
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
       - name: 🔄 Checkout do código
