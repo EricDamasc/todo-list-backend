@@ -6,7 +6,7 @@ from app.routers import tasks
 from app.auth import auth
 
 # Configuração do logger
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
@@ -25,6 +25,7 @@ app.add_middleware(
 
 @app.options("/{path:path}")
 async def preflight_request():
+    logger.info("Preflight request received")
     return {
         "message": "Preflight request successful"
     }
