@@ -34,12 +34,3 @@ jobs:
         run: |
           # Adicione aqui os comandos necessários para build do seu projeto
           echo "Build do projeto"
-
-      - name: 🔀 Criar Pull Request para develop
-        uses: peter-evans/create-pull-request@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.head_ref }}
-          title: "Merge feature branch into develop"
-          body: "Este PR foi criado automaticamente para mergear a branch feature na develop."
-          base: develop
