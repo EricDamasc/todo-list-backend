@@ -1,0 +1,42 @@
+name: CI - Build e Testes
+
+on:
+  push:
+    branches:
+      - "feature/*"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔄 Checkout do código
+        uses: actions/checkout@v3
+
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Instalar dependências dentro do projeto
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🧪 Rodar testes
+        run: |
+          pytest
+
+      - name: 🔨 Build do projeto
+        run: |
+          # Adicione aqui os comandos necessários para build do seu projeto
+          echo "Build do projeto"
+
+      - name: 🔀 Criar Pull Request para develop
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: develop
+          title: "Merge feature branch into develop"
+          body: "Este PR foi criado automaticamente para mergear a branch feature na develop."
+          base: develop
