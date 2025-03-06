@@ -35,7 +35,6 @@ app.add_middleware(
 @app.options("/{path:path}")
 async def preflight_request():
     logger.info("Preflight request received")
-    print("Preflight request received")
     return {
         "message": "Preflight request successful"
     }
@@ -44,7 +43,6 @@ async def preflight_request():
 @app.get("/", tags=["Home"])
 def root():
     logger.info("Root endpoint accessed")
-    print("Root endpoint accessed")
     return {"message": "Bem-vindo à API de Tarefas!"}
 
 
