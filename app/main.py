@@ -13,8 +13,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 # Configuração do CloudWatch
-cloudwatch_handler = CloudWatchLogHandler(
-    log_group=os.getenv("CLOUDWATCH_LOG_GROUP", "todo-list-backend-logs"),)
+cloudwatch_handler = CloudWatchLogHandler(log_group=os.getenv("CLOUDWATCH_LOG_GROUP", "lambdaTodoListApi"),)
 logger.addHandler(cloudwatch_handler)
 
 app = FastAPI(
@@ -37,6 +36,10 @@ async def preflight_request():
     logger.info("Preflight request received")
     return {
         "message": "Preflight request successful"
+    }, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
     }
 
 
