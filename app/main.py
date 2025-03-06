@@ -25,7 +25,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://todo-list-frontend-tan.vercel.app/"],
+    allow_origins=["https://kloc449ejb.execute-api.us-east-1.amazonaws.com", "https://todo-list-frontend-tan.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
