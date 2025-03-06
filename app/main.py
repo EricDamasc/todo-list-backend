@@ -25,7 +25,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200", "https://kloc449ejb.execute-api.us-east-1.amazonaws.com"],
+    allow_origins=["http://localhost:4200", "https://kloc449ejb.execute-api.us-east-1.amazonaws.com", "http://todo-list-angular-app.s3-website-us-east-1.amazonaws.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,6 +35,7 @@ app.add_middleware(
 @app.options("/{path:path}")
 async def preflight_request():
     logger.info("Preflight request received")
+    print("Preflight request received")
     return {
         "message": "Preflight request successful"
     }
@@ -43,6 +44,7 @@ async def preflight_request():
 @app.get("/", tags=["Home"])
 def root():
     logger.info("Root endpoint accessed")
+    print("Root endpoint accessed")
     return {"message": "Bem-vindo à API de Tarefas!"}
 
 
